@@ -65,6 +65,29 @@ def test_blocks_children_list(client, page_id):
 
 # Meeting notes require a plan with AI meeting notes enabled, so we can't record
 # a cassette with our test integration. Using a mock instead.
+def test_blocks_meeting_notes_create(client, mocker):
+    mock_response = {"object": "block", "id": "block-id"}
+    mock_request = mocker.patch.object(client, "request", return_value=mock_response)
+
+    response = client.blocks.meeting_notes.create(
+        title="Weekly sync",
+        source={"type": "block", "block_id": "audio-block-id"},
+    )
+
+    assert response["object"] == "block"
+    mock_request.assert_called_once_with(
+        path="blocks/meeting_notes",
+        method="POST",
+        body={
+            "title": "Weekly sync",
+            "source": {"type": "block", "block_id": "audio-block-id"},
+        },
+        auth=None,
+    )
+
+
+# Meeting notes require a plan with AI meeting notes enabled, so we can't record
+# a cassette with our test integration. Using a mock instead.
 def test_blocks_meeting_notes_query(client, mocker):
     mock_response = {"object": "list", "results": [], "has_more": False}
     mock_request = mocker.patch.object(client, "request", return_value=mock_response)
